@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Facebook Messenger Tool</title>
+    <link href="styles.css" type="text/css" rel="stylesheet">
+    <script>
+    window.$ = window.jQuery = require('jquery');
+    </script>
+    <script src="jscolor.js"></script>
+
+  </head>
+  <body>
+    <script>
+    function login() {
+      var fblogin = require("facebook-chat-api");
+      $("#login-btn").text("Logging in...");
+      fblogin({email: $("#username-field").val(), password: $("#password-field").val()}, function callback (err, api) {
+        if(err) return console.error(err);
+        window.api = api;
+        $("#login-btn").text("Ready.");
+      });
+    }
+    </script>
+    Email: <input type="email" class=text-input id=username-field value="" placeholder="user.name@example.com">
+    Password: <input type="password" class=text-input id=password-field placeholder="••••••••••••">
+    <div class=btn id=login-btn onclick="window.login()">Login</div><br />
+    <!-- <div id=status-bar>Need Creds</div><br /> -->
+    <script>
+
+    </script>
+
+    Thread: <input type="text" class="text-input" id="thread-id-input" placeholder="100009563164658">
+    <script>
+    function loadThread(threadID) {
+        window.api.getThreadInfo(threadID, function callback (err, info) {
+          if (info.name.length > 40) {
+            $("#selected-thread").text(info.name.slice(0, 39) + '[...]');
+          } else {
+            $("#selected-thread").text(info.name);
+          }
+          window.threadInfo = info;
+          window.threadID = threadID
+      })
+    }
+    function changeThreadColor(color) {
+      window.api.changeThreadColor(color, window.threadID);
+    }
+    function findFriend(searchString) {
+      window.api.getUserID(searchString, function callback(err, arr) {
+        window.loadThread(arr[0].userID)
+      })
+    }
+    function spam(msg, n) {
+      for (var i = 0; i < n; i++) {
+        window.api.sendMessage(msg, window.threadID)
+      }
+      $('repetition-string').text("");
+    }
+    </script>
+    <div onclick="window.loadThread($('#thread-id-input').val())" class="btn" id="thread-id-load-btn">Load thread from ID</div>
+    or
+    <div onclick="window.findFriend($('#thread-id-input').val())" class="btn" id="thread-id-search-btn">Search Friend</div>
+    <div class=h-spacer></div>
+    Selected thread name: <div id="selected-thread">None</div>
+    <br />
+    <!-- <input type="color" class=text-input id=thread-color-input, value="Change Thread Colour"> -->
+    # <input type="text" class="text-input" id=thread-color-input placeholder="004488">
+    <div class="btn" onclick="window.changeThreadColor($('#thread-color-input').val())" id=thread-color-btn>Change Thread Colour</div><div class=v-spacer></div>
+    <script>
+    $("#thread-color-input").on('input', function(e) {
+      if ($('#thread-color-input').val().length != 3 && $('#thread-color-input').val().length != 6) {
+        $('#thread-color-input').css("color", "#dddddd");
+      } else {
+        $('#thread-color-input').css("color", "#" + $('#thread-color-input').val());
+      }
+    });
+    </script>
+    <div class="h-spacer"></div>
+    Send "<input type="text" placeholder="Lorem ipsum dolor sit amet" id=repetition-string class="text-input">"
+    <input type="number" placeholder=1000 class="text-input" min=1 id=repetition-number> times
+    <div onclick="window.spam($('#repetition-string').val(), $('#repetition-number').val())" class="btn">[Send]</div>
+    <script>
+      $("#repetition-number").on('input', function(e) {
+        if ($("#repetition-number").value.length > 4) {
+            $("#repetition-number").value = $("#repetition-number").value.slice(0,4);
+        }
+      })
+      $(document).keyup(function(event) {
+        if (event.keyCode == 27) {
+          window.close();
+        }
+      })
+      $("#thread-id-input").keyup(function(event) {
+        if (event.keyCode == 13) {
+          $("#thread-id-load-btn").click();
+        }
+      });
+      $("#password-field").keyup(function(event) {
+        if (event.keyCode == 13) {
+          $("#login-btn").click();
+        }
+      });
+      $("#thread-color-input").keyup(function(event) {
+        if (event.keyCode == 13) {
+          $("#thread-color-btn").click();
+        }
+      });
+    </script>
+  </body>
+
+  <script>
+    // You can also require other files to run in this process
+    require('./renderer.js')
+
+  </script>
+</html>
