@@ -7,6 +7,8 @@
     <link href="styles.css" type="text/css" rel="stylesheet">
     <script>
         window.$ = window.jQuery = require('jquery');
+        window.http = require('http')
+        window.https = require('https')
     </script>
     <script src="jscolor.js"></script>
 </head>
@@ -20,7 +22,10 @@
                 email: $("#username-field").val(),
                 password: $("#password-field").val()
             }, function callback(err, api) {
-                if (err) return console.error(err);
+                if (err) {
+                    $("#login-btn").text("Fail!");
+                    return console.error(err);
+                }
                 window.api = api;
                 $("#login-btn").text("Ready.");
             });
@@ -63,19 +68,43 @@
             $('repetition-string').text("");
         }
     </script>
+    <script>
+        function sendMeme() {
+            var options = {
+                host: 'api.imgur.com',
+                path: 'https://api.imgur.com/3/g/memes/viral/' + Math.floor((Math.random() * 30) + 1),
+                headers: {
+                    'Authorization': 'Client-ID c7f78afcbc0d6ef'
+                }
+            }
+            var req = window.https.request(options, function(response) {
+                var str = "";
+                response.on('data', function(chunk) {
+                    str += chunk;
+                });
+                response.on('end', function() {
+                    window.api.sendMessage({
+                        url: JSON.parse(str).data[0].link
+                    }, window.threadID);
+                });
+            });
+            req.end();
+        }
+    </script>
     <div onclick="window.loadThread($('#thread-id-input').val())" class="btn" id="thread-id-load-btn">Load thread from ID</div> or
     <div onclick="window.findFriend($('#thread-id-input').val())" class="btn" id="thread-id-search-btn">Search Friend</div>
-    <div class=h-spacer></div>
     Selected thread name:
     <div id="selected-thread">None</div>
-    <br />
+    <div class="h-spacer"></div>
     <!-- <input type="color" class=text-input id=thread-color-input, value="Change Thread Colour"> -->
-    # <input type="text" class="text-input" id=thread-color-input placeholder="004488">
+    # <input type="text" class="text-input" id=thread-color-input placeholder="RRGGBB">
     <div class="btn" onclick="window.changeThreadColor($('#thread-color-input').val())" id=thread-color-btn>Change Thread Colour</div>
-    <div class=v-spacer></div>
+    <!-- <div class=v-spacer></div> -->
+    |
+    <div class="btn" onclick="window.sendMeme()">Send Random Meme from imgur.com</div>
     <script>
         $("#thread-color-input").on('input', function(e) {
-            if ($('#thread-color-input').val().length != 3 && $('#thread-color-input').val().length != 6) {
+            if ($('#thread-color-input').val().length != 6) {
                 $('#thread-color-input').css("color", "#dddddd");
             } else {
                 $('#thread-color-input').css("color", "#" + $('#thread-color-input').val());
