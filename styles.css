@@ -31,7 +31,7 @@ body {
     padding: 10px;
 }
 
-.text-input {
+.text-input, select {
     font-family: 'Consolas', 'DejaVu Sans Mono', monospace;
     background-color: #282C34;
     color: #888888;
@@ -71,6 +71,10 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
     color: #666666;
 }
 
+select::-webkit-input-placeholder {
+    color: #666666;
+}
+
 textarea::-webkit-input-placeholder {
     color: #666666;
 }
@@ -94,6 +98,10 @@ div.h-spacer {
     width: 123px;
 }
 
+#thread-emoji-input {
+    width: 56px;
+}
+
 #thread-color-input {
     font-weight: 550;
     border: none;
@@ -108,21 +116,58 @@ div.h-spacer {
     width: 100px;
 }
 
-div {
-    -webkit-app-region: no-drag;
+#user-select {
+    width: 140px;
 }
 
-textarea, input {
+#footer {
+    color: #555555;
+    float: right;
+    padding: 3px;
+}
+
+.drag {
+    -webkit-app-region: drag;
+}
+
+textarea, input, select, div {
     -webkit-app-region: no-drag;
     margin-bottom: 2px;
 }
 
-textarea:focus, input:focus, #thread-color-input:focus {
+.center {
+    margin: auto;
+    width: 330px;
+}
+
+.margin-bottom {
+    margin-bottom: 5px;
+}
+
+textarea:focus, input:focus, #thread-color-input:focus, select:focus, select:active, option:focus {
     outline: none;
     margin-bottom: 1px;
     border-bottom-color: #666666;
     border-bottom-style: solid;
     border-bottom-width: 1px;
+}
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+option:focus {
+    background-color: #383C44;
+}
+
+option:active {
+    background-color: #383C44;
+}
+
+#nickname-input {
+    width: 100px;
 }
 
 #selected-thread {
@@ -139,4 +184,9 @@ textarea:focus, input:focus, #thread-color-input:focus {
     width: 120px;
     color: black;
     align-items: center;
+}
+
+.nyi {
+    color: red !important;
+    cursor: default;
 }
