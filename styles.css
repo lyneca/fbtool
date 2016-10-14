@@ -1,192 +1,197 @@
 body {
-    background-color: #282C34;
-    font-family: 'Consolas', 'DejaVu Sans Mono', monospace;
-    font-size: 15px;
-    color: #aaaaaa;
-    -webkit-app-region: drag;
+  background-color: #282C34;
+  font-family: 'Consolas', 'DejaVu Sans Mono', monospace;
+  font-size: 15px;
+  color: #aaaaaa;
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
 }
 
 .btn {
-    display: inline-block;
-    padding: 3px;
-    /*border-radius: 3px;*/
-    /*border: 1px solid #11151B;*/
-    /*background-color: #21252B;*/
-    color: #dddddd;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -webkit-app-region: no-drag;
+  display: inline-block;
+  padding: 3px;
+  /*border-radius: 3px;*/
+  /*border: 1px solid #11151B;*/
+  /*background-color: #21252B;*/
+  color: #dddddd;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -webkit-app-region: no-drag;
 }
 
 .btn:hover {
-    color: #ffffff;
+  color: #ffffff;
 }
 
 .btn:active {
-    color: #dadada;
+  color: #dadada;
 }
 
 .btn-large {
-    font-size: 18px;
-    padding: 10px;
+  font-size: 18px;
+  padding: 10px;
 }
 
 .text-input, select {
-    font-family: 'Consolas', 'DejaVu Sans Mono', monospace;
-    background-color: #282C34;
-    color: #888888;
-    font-size: 15px;
-    border: none;
-    padding: 3px;
-    padding-left: none;
-    padding-right: none;
-    margin: 1px;
-    margin-bottom: 2px;
-    width: 180px;
-    outline: none;
-    box-shadow: none;
+  font-family: 'Consolas', 'DejaVu Sans Mono', monospace;
+  background-color: #282C34;
+  color: #888888;
+  font-size: 15px;
+  border: none;
+  padding: 3px;
+  padding-left: none;
+  padding-right: none;
+  margin: 1px;
+  margin-bottom: 2px;
+  width: 180px;
+  outline: none;
+  box-shadow: none;
 }
 
 textarea {
-    font-family: 'Consolas', 'DejaVu Sans Mono', monospace;
-    background-color: #282C34;
-    color: #888888;
-    font-size: 15px;
-    border: none;
-    padding: 3px;
-    resize: none;
+  font-family: 'Consolas', 'DejaVu Sans Mono', monospace;
+  background-color: #282C34;
+  color: #888888;
+  font-size: 15px;
+  border: none;
+  padding: 3px;
+  resize: none;
 }
 
 input[type=number] {
-    width: 35px;
-    text-align: right;
+  width: 35px;
+  text-align: right;
 }
 
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .text-input::-webkit-input-placeholder {
-    color: #666666;
+  color: #666666;
 }
 
 select::-webkit-input-placeholder {
-    color: #666666;
+  color: #666666;
 }
 
 textarea::-webkit-input-placeholder {
-    color: #666666;
+  color: #666666;
 }
 
 #repetition-string {
-    width: 213px !important;
+  width: 213px !important;
 }
 
 div.h-spacer {
-    width: 100%;
-    height: 1px;
-    background-color: #777777;
+  width: 100%;
+  height: 1px;
+  background-color: #777777;
 }
 
 .right-border {
-    border-right: 1px solid #777777;
-    padding-right: 10px !important;
+  border-right: 1px solid #777777;
+  padding-right: 10px !important;
 }
 
 #thread-id-input {
-    width: 123px;
+  width: 123px;
 }
 
 #thread-emoji-input {
-    width: 56px;
+  width: 56px;
 }
 
 #thread-color-input {
-    font-weight: 550;
-    border: none;
-    font-family: 'Consolas', 'DejaVu Sans Mono', monospace;
-    font-size: 15px;
-    padding-left: 0px;
-    width: 51px;
-    background-color: #282C34;
+  font-weight: 550;
+  border: none;
+  font-family: 'Consolas', 'DejaVu Sans Mono', monospace;
+  font-size: 15px;
+  padding-left: 0px;
+  width: 51px;
+  background-color: #282C34;
 }
 
 #password-field {
-    width: 100px;
+  width: 100px;
 }
 
 #user-select {
-    width: 140px;
+  width: 140px;
 }
 
 #footer {
-    color: #555555;
-    float: right;
-    padding: 3px;
+  color: #555555;
+  float: right;
+  padding: 3px;
+}
+
+.right {
+  float: right;
 }
 
 .drag {
-    -webkit-app-region: drag;
+  -webkit-app-region: drag;
 }
 
 textarea, input, select, div {
-    -webkit-app-region: no-drag;
-    margin-bottom: 2px;
+  -webkit-app-region: no-drag;
+  margin-bottom: 2px;
 }
 
 .center {
-    margin: auto;
-    width: 330px;
+  margin: auto;
+  width: 330px;
 }
 
 .margin-bottom {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 textarea:focus, input:focus, #thread-color-input:focus, select:focus, select:active, option:focus {
-    outline: none;
-    margin-bottom: 1px;
-    border-bottom-color: #666666;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
+  outline: none;
+  margin-bottom: 1px;
+  border-bottom-color: #666666;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
 }
 
 select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 option:focus {
-    background-color: #383C44;
+  background-color: #383C44;
 }
 
 option:active {
-    background-color: #383C44;
+  background-color: #383C44;
 }
 
 #nickname-input {
-    width: 100px;
+  width: 100px;
 }
 
 #selected-thread {
-    display: inline-block;
-    padding: 3px;
+  display: inline-block;
+  padding: 3px;
 }
 
 #status-bar {
-    display: inline-block;
-    padding: 3px;
-    border-radius: 3px;
-    border: 1px solid #11151B;
-    background-color: #EA0;
-    width: 120px;
-    color: black;
-    align-items: center;
+  display: inline-block;
+  padding: 3px;
+  border-radius: 3px;
+  border: 1px solid #11151B;
+  background-color: #EA0;
+  width: 120px;
+  color: black;
+  align-items: center;
 }
 
 .nyi {
-    color: red !important;
-    cursor: default;
+  color: red !important;
+  cursor: default;
 }
