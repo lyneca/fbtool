@@ -30,8 +30,8 @@ App design fits right in with the atom editor, because, well, it's the same colo
 3. Enjoy!
 
 
-- Login may take 5-10 seconds
-- the `[emoji]` field must contain a valid single emoji
+- Login may take 5-10 seconds.
+- the `[emoji]` field must contain a valid single emoji.
 
 
 ### Running from source
@@ -40,10 +40,11 @@ App design fits right in with the atom editor, because, well, it's the same colo
 ```bash
 $ git config core.longpaths true
 ```
-at `global` or `system` level.
+at `--global` or `--system` level.
 
 Once you've cloned the source, cd to the root and
 ```bash
+$ npm install electron
 $ npm install && npm start
 ```
 or if `electron` is already installed:
