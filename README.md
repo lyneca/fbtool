@@ -40,10 +40,6 @@ Once you've cloned the source, cd to the root and
 ```bash
 $ npm install && npm start
 ```
-or if `electron` is already installed:
-```bash
-$ electron .
-```
 
 ### Building
 Project is built using [electron-packager](https://www.npmjs.com/package/electron-packager).
