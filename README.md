@@ -36,15 +36,8 @@ App design fits right in with the atom editor, because, well, it's the same colo
 
 ### Running from source
 
-**IMPORTANT:** This repository contains files which have names too long for git to clone normally. To clone, you have to first
-```bash
-$ git config core.longpaths true
-```
-at `--global` or `--system` level.
-
 Once you've cloned the source, cd to the root and
 ```bash
-$ npm install electron
 $ npm install && npm start
 ```
 or if `electron` is already installed:
