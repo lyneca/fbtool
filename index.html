@@ -9,6 +9,9 @@
     window.$ = window.jQuery = require('jquery');
     window.http = require('http')
     window.https = require('https')
+    window.stopListening = function() {}
+    window.lastMessageID = 0;
+    window.open = require('open')
   </script>
 </head>
 
@@ -94,7 +97,6 @@
           });
         });
       }
-      window.stopListening = function() {}
     </script>
     email: <input autofocus type="email" class=text-input id=username-field value="" placeholder="user.name@example.com"> password: <input type="password" class=text-input id=password-field placeholder="••••••••••••">
     <div class=btn id=login-btn onclick="window.login()">login</div>
@@ -102,6 +104,12 @@
 
     thread: <input type="text" class="text-input" id="thread-id-input" placeholder="100009563164658">
     <script>
+      function format(string) {
+        var urlexpr = /((https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,}))/gi
+        var regex = new RegExp(urlexpr);
+        return string.replace(regex, "<span class=url onclick='window.open(\"$1\")'>$1</span>")
+      }
+
       function loadThread(threadID) {
         window.stopListening()
         window.api.getThreadInfo(threadID, function callback(err, info) {
@@ -113,6 +121,7 @@
           window.threadInfo = info;
           window.threadID = threadID
           $('#user-select').empty()
+          $('#message-container').empty()
           window.api.getUserInfo(info.participantIDs, function(err, ret) {
             window.users = ret
             for (var prop in ret) {
@@ -130,9 +139,9 @@
                   }
                 }
                 if (user.id == window.currentUserID) {
-                  $('#message-container').append("<div class='message other'>" + user.name + ": " + message.body + "</div>")
+                  $('#message-container').append("<div class='message other'>" + user.name + ": " + window.format(message.body) + "</div>")
                 } else {
-                  $('#message-container').append("<div class='message self'>" + user.name + ": " + message.body + "</div>")
+                  $('#message-container').append("<div class='message self'>" + user.name + ": " + window.format(message.body) + "</div>")
                 }
               }
               updateScroll()
@@ -146,14 +155,15 @@
                       user.id = prop
                     }
                   }
-                  if (message.threadID == window.threadID) {
+                  if (message.threadID == window.threadID && message.messageID != window.lastMessageID) {
+                    window.lastMessageID = message.messageID;
                     if (user.id == window.currentUserID) {
-                      $('#message-container').append("<div class='message other'>" + user.name + ": " + message.body + "</div>")
+                      $('#message-container').append("<div class='message other'>" + user.name + ": " + window.format(message.body) + "</div>")
                     } else {
-                      $('#message-container').append("<div class='message self'>" + user.name + ": " + message.body + "</div>")
+                      $('#message-container').append("<div class='message self'>" + user.name + ": " + window.format(message.body) + "</div>")
                     }
+                    updateScroll()
                   }
-                  updateScroll()
                 }
               });
             });
@@ -385,8 +395,6 @@
   // You can also require other files to run in this process
   require('./renderer.js')
 </script>
-
-</html>
 
 </body>
 

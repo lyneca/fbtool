@@ -213,6 +213,20 @@ div.h-spacer {
   background-color: #282C34;
 }
 
+span.url {
+  text-decoration: underline;
+  color: #999999;
+  cursor: pointer;
+}
+
+span.url:hover {
+  color: #BBBBBB;
+}
+
+span.url:active {
+  color: #AAAAAA;
+}
+
 #password-field {
   width: 100px;
 }
@@ -247,6 +261,8 @@ div.h-spacer {
   width: 100% - 10px;
   height: 80%;
   background-color: #282C34;
+  -webkit-app-region: no-drag;
+  -webkit-user-select: auto;
 }
 
 #input-container {
@@ -262,10 +278,12 @@ div.h-spacer {
   color: #888888;
   font-size: 15px;
   border: none;
-  width: 100%;
+  width: calc(100% - 10px);
   height: 100%;
   outline: none;
   box-shadow: none;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .right {
@@ -276,7 +294,7 @@ div.h-spacer {
   -webkit-app-region: drag;
 }
 
-textarea, input, select, div {
+textarea, input, select {
   -webkit-app-region: no-drag;
   margin-bottom: 3px;
 }
