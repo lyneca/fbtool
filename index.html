@@ -147,15 +147,14 @@
         $('#listen-btn').text('[stop]');
 
         var stop = window.api.listen(function(err, msg) {
-          // alert("Got something: " + msg.type + ' ' + msg.body);
-          // if (msg.type == 'message') {
-          //   alert(msg.body);
-          //   if (patt.test(msg.body)) {
-          //     var res = msg.body.replace(patt, r);
-          //     alert(res);
-          //     window.api.sendMessage(res, window.threadID);
-          //   }
-          // }
+          if (msg.type == 'message') {
+            if (msg.threadID == window.threadID) {
+              if (patt.test(msg.body)) {
+                var res = msg.body.replace(patt, r);
+                window.api.sendMessage(res, window.threadID);
+              }
+            }
+          }
         });
       }
     }
