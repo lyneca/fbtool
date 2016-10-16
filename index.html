@@ -43,7 +43,7 @@
           window.currentUserID = window.api.getCurrentUserID()
           $("#login-btn").text("ready.");
           $("#thread-select-list").empty()
-          window.api.getThreadList(0, 10, 'inbox', function(err, arr) {
+          window.api.getThreadList(0, 1000, 'inbox', function(err, arr) {
             var done = true
             var i = 0;
 
