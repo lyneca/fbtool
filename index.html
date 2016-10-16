@@ -13,252 +13,322 @@
 </head>
 
 <body>
-  <div class="right btn" style="position: relative; bottom: 4px;" onclick="window.close();">close</div>
-  <div class="center margin-bottom drag">- - - facebook messenger powertool - - -</div>
-  <div class="h-spacer"></div>
-  <script>
-    function login() {
-      var fblogin = require("facebook-chat-api");
-      $("#login-btn").text("logging in...");
-      fblogin({
-        email: $("#username-field").val(),
-        password: $("#password-field").val()
-      }, function callback(err, api) {
-        if (err) {
-          $("#login-btn").text("failed!");
-          return console.error(err);
-        }
-        window.api = api;
-        // window.api.setOptions({
-        //   selfListen: true,
-        // })
-        $("#login-btn").text("ready.");
-      });
-    }
-  </script>
-  email: <input type="email" class=text-input id=username-field value="" placeholder="user.name@example.com"> password: <input type="password" class=text-input id=password-field placeholder="••••••••••••">
-  <div class=btn id=login-btn onclick="window.login()">login</div><br />
-  <!-- <div id=status-bar>Need Creds</div><br /> -->
-  <script>
-  </script>
-
-  thread: <input type="text" class="text-input" id="thread-id-input" placeholder="100009563164658">
-  <script>
-    function loadThread(threadID) {
-      window.api.getThreadInfo(threadID, function callback(err, info) {
-        if (info.name.length > 40) {
-          $("#selected-thread").text(info.name.slice(0, 39) + '[...]');
-        } else {
-          $("#selected-thread").text(info.name);
-        }
-        window.threadInfo = info;
-        window.threadID = threadID
-        $('#user-select').empty()
-        window.api.getUserInfo(info.participantIDs, function(err, ret) {
-          for (var prop in ret) {
-            $('#user-select').append("<option value='" + prop + "'>" + ret[prop].name + "</option>")
+  <div id=thread-select>
+    thread list
+    <ul id=thread-select-list>
+      <li>not logged in</li>
+    </ul>
+  </div>
+  <div id=control-panel>
+    <div class="right btn" style="position: relative; bottom: 4px;" onclick="window.close();">close</div>
+    <div class="center margin-bottom drag">- - - facebook messenger powertool - - -</div>
+    <div class="h-spacer"></div>
+    <script>
+      function login() {
+        var fblogin = require("facebook-chat-api");
+        $("#login-btn").text("logging in...");
+        fblogin({
+          email: $("#username-field").val(),
+          password: $("#password-field").val()
+        }, function callback(err, api) {
+          if (err) {
+            $("#login-btn").text("failed!");
+            alert(err)
+            return console.error(err);
           }
-        });
-      });
-    }
+          window.api = api;
+          // window.api.setOptions({
+          //   selfListen: true,
+          // })
+          window.currentUserID = window.api.getCurrentUserID()
+          $("#login-btn").text("ready.");
+          $("#thread-select-list").empty()
+          window.api.getThreadList(0, 10, 'inbox', function(err, arr) {
+            var done = true
+            var i = 0;
 
-    function changeThreadColor(color) {
-      window.api.changeThreadColor(color, window.threadID);
-    }
-
-    function findFriend(searchString) {
-      window.api.getUserID(searchString, function callback(err, arr) {
-        window.loadThread(arr[0].userID)
-      })
-    }
-
-    function spam(msg, n) {
-      for (var i = 0; i < n; i++) {
-        window.api.sendMessage(msg, window.threadID)
-      }
-      $('repetition-string').text("");
-    }
-
-    function setEmoji(emoji) {
-      window.api.changeThreadEmoji(emoji, window.threadID);
-    }
-
-    function setNickname(nickname, userID) {
-      window.api.changeNickname(nickname, window.threadID, userID)
-    }
-  </script>
-  <script>
-    function sendMeme() {
-      var options = {
-        host: 'api.imgur.com',
-        path: 'https://api.imgur.com/3/g/memes/viral/' + Math.floor((Math.random() * 30) + 1),
-        headers: {
-          'Authorization': 'Client-ID c7f78afcbc0d6ef'
-        }
-      }
-      var req = window.https.request(options, function(response) {
-        var str = "";
-        response.on('data', function(chunk) {
-          str += chunk;
-        });
-        response.on('end', function() {
-          window.api.sendMessage({
-            url: JSON.parse(str).data[0].link,
-            body: JSON.parse(str).data[0].title
-          }, window.threadID);
-        });
-      });
-      req.end();
-    }
-
-    function sendCute() {
-      var options = {
-        host: 'api.imgur.com',
-        path: 'https://api.imgur.com/3/gallery/r/aww/time/' + Math.floor((Math.random() * 30) + 1),
-        headers: {
-          'Authorization': 'Client-ID c7f78afcbc0d6ef'
-        }
-      }
-      var req = window.https.request(options, function(response) {
-        var str = "";
-        response.on('data', function(chunk) {
-          str += chunk;
-        });
-        response.on('end', function() {
-          window.api.sendMessage({
-            url: JSON.parse(str).data[0].link,
-            body: JSON.parse(str).data[0].title
-          }, window.threadID);
-        });
-      });
-      req.end();
-    }
-
-    function listen(m, r) {
-      var patt = new RegExp(m, 'g')
-      if (window.listen_state) {
-        alert("Stopped")
-        return stop();
-        window.listen_state = false
-        $('#listen-btn').text('[listen]');
-      } else {
-        alert("Started")
-        window.listen_state = true
-        $('#listen-btn').text('[stop]');
-
-        var stop = window.api.listen(function(err, msg) {
-          if (msg.type == 'message') {
-            if (msg.threadID == window.threadID) {
-              if (patt.test(msg.body)) {
-                var res = msg.body.replace(patt, r);
-                window.api.sendMessage(res, window.threadID);
+            function loop() {
+              var thread = arr[i];
+              if (thread.name == '') {
+                var name;
+                window.api.getUserInfo(thread.participantIDs[0], function(err, obj) {
+                  if (err) {
+                    alert(err);
+                    return
+                  }
+                  for (var prop in obj) {
+                    name = obj[prop].name;
+                    break;
+                  }
+                  if (name.length < 24) {
+                    var str = "<li><div class=thread id=" + thread.threadID + ">thread #" + thread.threadID + "<br />" + name + "</div></li>";
+                  } else {
+                    var str = "<li><div class=thread id=" + thread.threadID + ">thread #" + thread.threadID + "<br />" + name.slice(0, 22) + "[...]</div></li>";
+                  }
+                  $("#thread-select-list").append(str);
+                  $(document.body).on('click', "#" + thread.threadID, function() {
+                    loadThread(this.id);
+                  });
+                  i++;
+                  if (i < arr.length) {
+                    loop()
+                  }
+                });
+              } else {
+                if (thread.name.length < 24) {
+                  var str = "<li><div class=thread id=" + thread.threadID + ">thread #" + thread.threadID + "<br />" + thread.name + "</div></li>";
+                } else {
+                  var str = "<li><div class=thread id=" + thread.threadID + ">thread #" + thread.threadID + "<br />" + thread.name.slice(0, 22) + "[...]</div></li>";
+                }
+                $("#thread-select-list").append(str);
+                $(document.body).on('click', "#" + thread.threadID, function() {
+                  loadThread(this.id);
+                });
+                i++;
+                if (i < arr.length) {
+                  loop()
+                }
               }
             }
-          }
+            loop()
+          });
         });
       }
-    }
-  </script>
-  <div onclick="window.loadThread($('#thread-id-input').val())" class="btn" id="thread-id-load-btn">load thread from ID</div> or
-  <div onclick="window.findFriend($('#thread-id-input').val())" class="btn" id="thread-id-search-btn">search friend</div>
-  selected thread:
-  <div id="selected-thread" class="drag">none</div>
-  <div class="h-spacer"></div>
-  set emoji to <input type=text class=text-input id=thread-emoji-input placeholder="[emoji]">
-  <div class=btn id=thread-emoji-btn onclick="window.setEmoji($('#thread-emoji-input').val())">[set]</div>
-  or colour to # <input type="text" class="text-input" id=thread-color-input placeholder="RRGGBB">
-  <div class="btn" onclick="window.changeThreadColor($('#thread-color-input').val())" id=thread-color-btn>[set]</div>
-  <script>
-    $("#thread-color-input").on('input', function(e) {
-      if ($('#thread-color-input').val().length != 6) {
-        $('#thread-color-input').css("color", "#dddddd");
-      } else {
-        $('#thread-color-input').css("color", "#" + $('#thread-color-input').val());
+    </script>
+    email: <input type="email" class=text-input id=username-field value="" placeholder="user.name@example.com"> password: <input type="password" class=text-input id=password-field placeholder="••••••••••••">
+    <div class=btn id=login-btn onclick="window.login()">login</div><br />
+    <!-- <div id=status-bar>Need Creds</div><br /> -->
+    <script>
+    </script>
+
+    thread: <input type="text" class="text-input" id="thread-id-input" placeholder="100009563164658">
+    <script>
+      function loadThread(threadID) {
+        window.api.getThreadInfo(threadID, function callback(err, info) {
+          if (info.name.length > 40) {
+            $("#selected-thread").text(info.name.slice(0, 39) + '[...]');
+          } else {
+            $("#selected-thread").text(info.name);
+          }
+          window.threadInfo = info;
+          window.threadID = threadID
+          $('#user-select').empty()
+          window.api.getUserInfo(info.participantIDs, function(err, ret) {
+            for (var prop in ret) {
+              $('#user-select').append("<option value='" + prop + "'>" + ret[prop].name + "</option>")
+            }
+          });
+        });
       }
-    });
-  </script>
-  <div class="h-spacer"></div>
-  send '<input type="text" placeholder="lorem ipsum dolor sit amet" id=repetition-string class="text-input">'
-  <input type="number" placeholder=1000 class="text-input" min=1 id=repetition-number> times
-  <div onclick="window.spam($('#repetition-string').val(), $('#repetition-number').val())" class="btn">[send]</div>
-  <div class="h-spacer"></div>
-  send random
-  <div class="btn" onclick="window.sendMeme()">meme from imgur.com</div> or
-  <div class="btn" onclick="window.sendCute()">cute pic from /r/aww</div>
-  <div class="h-spacer"></div>
-  set <select id=user-select style="margin:0;padding:0">
+
+      function changeThreadColor(color) {
+        window.api.changeThreadColor(color, window.threadID);
+      }
+
+      function findFriend(searchString) {
+        window.api.getUserID(searchString, function callback(err, arr) {
+          window.loadThread(arr[0].userID)
+        })
+      }
+
+      function spam(msg, n) {
+        for (var i = 0; i < n; i++) {
+          window.api.sendMessage(msg, window.threadID)
+        }
+        $('repetition-string').text("");
+      }
+
+      function setEmoji(emoji) {
+        window.api.changeThreadEmoji(emoji, window.threadID);
+      }
+
+      function setNickname(nickname, userID) {
+        window.api.changeNickname(nickname, window.threadID, userID)
+      }
+    </script>
+    <script>
+      function sendMeme() {
+        var options = {
+          host: 'api.imgur.com',
+          path: 'https://api.imgur.com/3/g/memes/viral/' + Math.floor((Math.random() * 30) + 1),
+          headers: {
+            'Authorization': 'Client-ID c7f78afcbc0d6ef'
+          }
+        }
+        var req = window.https.request(options, function(response) {
+          var str = "";
+          response.on('data', function(chunk) {
+            str += chunk;
+          });
+          response.on('end', function() {
+            window.api.sendMessage({
+              url: JSON.parse(str).data[0].link,
+              body: JSON.parse(str).data[0].title
+            }, window.threadID);
+          });
+        });
+        req.end();
+      }
+
+      function sendCute() {
+        var options = {
+          host: 'api.imgur.com',
+          path: 'https://api.imgur.com/3/gallery/r/aww/time/' + Math.floor((Math.random() * 30) + 1),
+          headers: {
+            'Authorization': 'Client-ID c7f78afcbc0d6ef'
+          }
+        }
+        var req = window.https.request(options, function(response) {
+          var str = "";
+          response.on('data', function(chunk) {
+            str += chunk;
+          });
+          response.on('end', function() {
+            window.api.sendMessage({
+              url: JSON.parse(str).data[0].link,
+              body: JSON.parse(str).data[0].title
+            }, window.threadID);
+          });
+        });
+        req.end();
+      }
+
+      function listen(m, r) {
+        var patt = new RegExp(m, 'g')
+        if (window.listen_state) {
+          alert("Stopped")
+          return stop();
+          window.listen_state = false
+          $('#listen-btn').text('[listen]');
+        } else {
+          alert("Started")
+          window.listen_state = true
+          $('#listen-btn').text('[stop]');
+
+          var stop = window.api.listen(function(err, msg) {
+            if (msg.type == 'message') {
+              if (msg.threadID == window.threadID) {
+                if (patt.test(msg.body)) {
+                  var res = msg.body.replace(patt, r);
+                  window.api.sendMessage(res, window.threadID);
+                }
+              }
+            }
+          });
+        }
+      }
+    </script>
+    <div onclick="window.loadThread($('#thread-id-input').val())" class="btn" id="thread-id-load-btn">load thread from ID</div> or
+    <div onclick="window.findFriend($('#thread-id-input').val())" class="btn" id="thread-id-search-btn">search friend</div>
+    selected thread:
+    <div id="selected-thread" class="drag">none</div>
+    <div class="h-spacer"></div>
+    set emoji to <input type=text class=text-input id=thread-emoji-input placeholder="[emoji]">
+    <div class=btn id=thread-emoji-btn onclick="window.setEmoji($('#thread-emoji-input').val())">[set]</div>
+    or colour to # <input type="text" class="text-input" id=thread-color-input placeholder="RRGGBB">
+    <div class="btn" onclick="window.changeThreadColor($('#thread-color-input').val())" id=thread-color-btn>[set]</div>
+    <script>
+      $("#thread-color-input").on('input', function(e) {
+        if ($('#thread-color-input').val().length != 6) {
+          $('#thread-color-input').css("color", "#dddddd");
+        } else {
+          $('#thread-color-input').css("color", "#" + $('#thread-color-input').val());
+        }
+      });
+    </script>
+    <div class="h-spacer"></div>
+    send '<input type="text" placeholder="lorem ipsum dolor sit amet" id=repetition-string class="text-input">'
+    <input type="number" placeholder=1000 class="text-input" min=1 id=repetition-number> times
+    <div onclick="window.spam($('#repetition-string').val(), $('#repetition-number').val())" class="btn">[send]</div>
+    <div class="h-spacer"></div>
+    send random
+    <div class="btn" onclick="window.sendMeme()">meme from imgur.com</div> or
+    <div class="btn" onclick="window.sendCute()">cute pic from /r/aww</div>
+    <div class="h-spacer"></div>
+    set <select id=user-select style="margin:0;padding:0">
       <option>**select thread**</option>
     </select>'s nickname to <input type=text class="text-input" id="nickname-input" placeholder="John Cena">
-  <div class=btn onclick="window.setNickname($('#nickname-input').val(), $('#user-select').val())">[set]</div>
-  <div class="h-spacer"></div>
-  when regex match /<input type=text class="text-input regex" id=regex-match placeholder="[Hh]ello (\w+)">/ send '<input type=text class="text-input regex" id=regex-replace placeholder="Hello, $1! :D">'
-  <div class=btn onclick="window.listen($('#regex-match').val(), $('#regex-replace').val())" id=listen-btn>[listen]</div>
-  <div class="">
-    <span id=footer class="drag">made with <span id=noun>something</span> by lyneca</span>
-    <script>
-      $('#regex-match').on('input', function(e) {
-        var isValid = true;
-        try {
-          new RegExp($(this).val());
-        } catch (e) {
-          isValid = false;
-        }
-        if (isValid) {
-          $(this).css('color', 'inherit')
-        } else {
-          $(this).css('color', 'red')
-        }
-      });
-    </script>
-    <script>
-      $("#repetition-number").on('input', function(e) {
-        if ($("#repetition-number").value.length > 4) {
-          $("#repetition-number").value = $("#repetition-number").value.slice(0, 4);
-        }
-      });
-      $(document).ready(function() {
-        var nouns = [
-          'love',
-          'your best interests at heart ',
-          'my best interests at heart ',
-          'friggin\' sick hax',
-          'like zero effort',
-          'electron',
-          'atom',
-          'the help of stackoverflow',
-          'some node.js packages',
-          'bats',
-          'some scripting language',
-          'anything but java',
-          'a few temporary facebook bans',
-          'no respect for statewide testing',
-          'communism',
-          '1 weird tip',
+    <div class=btn onclick="window.setNickname($('#nickname-input').val(), $('#user-select').val())">[set]</div>
+    <div class="h-spacer"></div>
+    when regex match /<input type=text class="text-input regex" id=regex-match placeholder="[Hh]ello (\w+)">/ send '<input type=text class="text-input regex" id=regex-replace placeholder="Hello, $1! :D">'
+    <div class=btn onclick="window.listen($('#regex-match').val(), $('#regex-replace').val())" id=listen-btn>[listen]</div>
+    <div class="h-spacer"></div>
+    <div class="">
+      <span id=footer class="drag">made with <span id=noun>something</span> by lyneca</span>
+      <script>
+        $('#regex-match').on('input', function(e) {
+          var isValid = true;
+          try {
+            new RegExp($(this).val());
+          } catch (e) {
+            isValid = false;
+          }
+          if (isValid) {
+            $(this).css('color', 'inherit')
+          } else {
+            $(this).css('color', 'red')
+          }
+        });
+      </script>
+      <script>
+        $("#repetition-number").on('input', function(e) {
+          if ($("#repetition-number").value.length > 4) {
+            $("#repetition-number").value = $("#repetition-number").value.slice(0, 4);
+          }
+        });
+        $(document).ready(function() {
+          var nouns = [
+            'love',
+            'your best interests at heart ',
+            'my best interests at heart ',
+            'friggin\' sick hax',
+            'like zero effort',
+            'electron',
+            'atom',
+            'the help of stackoverflow',
+            'some node.js packages',
+            'bats',
+            'some scripting language',
+            'anything but java',
+            'a few temporary facebook bans',
+            'no respect for statewide testing',
+            'communism',
+            '1 weird tip',
 
-        ]
-        $('#noun').text(nouns[Math.floor(Math.random() * nouns.length)])
-      });
-      $(document).keyup(function(event) {
-        if (event.keyCode == 27) {
-          window.close();
-        }
-      });
-      $("#thread-id-input").keyup(function(event) {
-        if (event.keyCode == 13) {
-          $("#thread-id-load-btn").click();
-        }
-      });
-      $("#password-field").keyup(function(event) {
-        if (event.keyCode == 13) {
-          $("#login-btn").click();
-        }
-      });
-      $("#thread-color-input").keyup(function(event) {
-        if (event.keyCode == 13) {
-          $("#thread-color-btn").click();
-        }
-      });
-    </script>
+          ]
+          $('#noun').text(nouns[Math.floor(Math.random() * nouns.length)])
+        });
+        $(document).keyup(function(event) {
+          if (event.keyCode == 27) {
+            window.close();
+          }
+        });
+        $("#thread-id-input").keyup(function(event) {
+          if (event.keyCode == 13) {
+            $("#thread-id-load-btn").click();
+          }
+        });
+        $("#password-field").keyup(function(event) {
+          if (event.keyCode == 13) {
+            $("#login-btn").click();
+          }
+        });
+        $("#thread-color-input").keyup(function(event) {
+          if (event.keyCode == 13) {
+            $("#thread-color-btn").click();
+          }
+        });
+      </script>
+    </div>
+</body>
+
+<script>
+  // You can also require other files to run in this process
+  require('./renderer.js')
+</script>
+
+</html>
+
 </body>
 
 <script>
