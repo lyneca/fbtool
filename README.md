@@ -7,6 +7,7 @@ This project uses the awesome [facebook-chat-api](https://github.com/Schmavery/f
 App design fits right in with the atom editor, because, well, it's the same colour.
 ## Features:
 - Log in and select thread
+  - from a sidebar!
   - by ID
   - by searching a name of a 1-on-1 convo
 - Change:
@@ -21,6 +22,7 @@ App design fits right in with the atom editor, because, well, it's the same colo
 ## Usage
 1. Enter email/password and click `login` (or hit enter for the more keyboard friendly among us)
 2. Select thread
+  - Click on the thread on the all-new thread sidebar!
   - If a one-on-one thread (two people only):
     - Enter the name of the other person into the `thread:` field
     - Click `search friend`
