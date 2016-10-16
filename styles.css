@@ -7,6 +7,100 @@ body {
   -webkit-user-select: none;
 }
 
+
+/*div, li, ul {
+  border: 1px solid white;
+}*/
+
+#thread-select {
+  float: left;
+  display: inline-block;
+  height: 250px;
+  width: 240px;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-button {
+  width: 0px;
+  height: 0px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c4c4c4;
+  border: 0px none #ffffff;
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #dddddd;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #9f9f9f;
+}
+
+::-webkit-scrollbar-track {
+  background: #666666;
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-track:hover {
+  background: #666666;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+div.first-thread {
+  border-top: 1px solid #777777;
+}
+
+div.thread {
+  display: block;
+  border-bottom: 1px solid #777777;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  cursor: pointer;
+  color: #dddddd;
+  -webkit-user-select: none;
+  -webkit-app-region: no-drag;
+}
+
+div.thread:hover {
+  color: #ffffff !important;
+}
+
+div.thread:active {
+  color: #dadada !important;
+}
+
+ul {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  overflow-y: scroll;
+  list-style-type: none;
+  padding: 0;
+  margin-top: 0;
+}
+
+li {
+  width: 98%;
+}
+
+#control-panel {
+  float: right;
+  width: 583px;
+  display: inline-block;
+  border-left: 1px solid #777777;
+  padding-left: 3px;
+}
+
 .btn {
   display: inline-block;
   padding: 3px;
@@ -19,11 +113,11 @@ body {
   -webkit-app-region: no-drag;
 }
 
-.btn:hover {
+div.btn:hover {
   color: #ffffff;
 }
 
-.btn:active {
+div.btn:active, div.thread:hover {
   color: #dadada;
 }
 
@@ -129,6 +223,7 @@ div.h-spacer {
   color: #555555;
   float: right;
   padding: 3px;
+  margin-top: 5px;
 }
 
 .right {
