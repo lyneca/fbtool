@@ -29,6 +29,9 @@
           return console.error(err);
         }
         window.api = api;
+        // window.api.setOptions({
+        //   selfListen: true,
+        // })
         $("#login-btn").text("ready.");
       });
     }
@@ -130,6 +133,31 @@
       });
       req.end();
     }
+
+    function listen(m, r) {
+      var patt = new RegExp(m, 'g')
+      if (window.listen_state) {
+        alert("Stopped")
+        return stop();
+        window.listen_state = false
+        $('#listen-btn').text('[listen]');
+      } else {
+        alert("Started")
+        window.listen_state = true
+        $('#listen-btn').text('[stop]');
+
+        var stop = window.api.listen(function(err, msg) {
+          if (msg.type == 'message') {
+            if (msg.threadID == window.threadID) {
+              if (patt.test(msg.body)) {
+                var res = msg.body.replace(patt, r);
+                window.api.sendMessage(res, window.threadID);
+              }
+            }
+          }
+        });
+      }
+    }
   </script>
   <div onclick="window.loadThread($('#thread-id-input').val())" class="btn" id="thread-id-load-btn">load thread from ID</div> or
   <div onclick="window.findFriend($('#thread-id-input').val())" class="btn" id="thread-id-search-btn">search friend</div>
@@ -150,7 +178,7 @@
     });
   </script>
   <div class="h-spacer"></div>
-  send "<input type="text" placeholder="lorem ipsum dolor sit amet" id=repetition-string class="text-input">"
+  send '<input type="text" placeholder="lorem ipsum dolor sit amet" id=repetition-string class="text-input">'
   <input type="number" placeholder=1000 class="text-input" min=1 id=repetition-number> times
   <div onclick="window.spam($('#repetition-string').val(), $('#repetition-number').val())" class="btn">[send]</div>
   <div class="h-spacer"></div>
@@ -162,9 +190,26 @@
       <option>**select thread**</option>
     </select>'s nickname to <input type=text class="text-input" id="nickname-input" placeholder="John Cena">
   <div class=btn onclick="window.setNickname($('#nickname-input').val(), $('#user-select').val())">[set]</div>
+  <div class="h-spacer"></div>
+  when regex match /<input type=text class="text-input regex" id=regex-match placeholder="[Hh]ello (\w+)">/ send '<input type=text class="text-input regex" id=regex-replace placeholder="Hello, $1! :D">'
+  <div class=btn onclick="window.listen($('#regex-match').val(), $('#regex-replace').val())" id=listen-btn>[listen]</div>
   <div class="">
-
     <span id=footer class="drag">made with <span id=noun>something</span> by lyneca</span>
+    <script>
+      $('#regex-match').on('input', function(e) {
+        var isValid = true;
+        try {
+          new RegExp($(this).val());
+        } catch (e) {
+          isValid = false;
+        }
+        if (isValid) {
+          $(this).css('color', 'inherit')
+        } else {
+          $(this).css('color', 'red')
+        }
+      });
+    </script>
     <script>
       $("#repetition-number").on('input', function(e) {
         if ($("#repetition-number").value.length > 4) {
@@ -181,13 +226,14 @@
           'electron',
           'atom',
           'the help of stackoverflow',
-          'some node.js package',
+          'some node.js packages',
           'bats',
           'some scripting language',
           'anything but java',
           'a few temporary facebook bans',
           'no respect for statewide testing',
           'communism',
+          '1 weird tip',
 
         ]
         $('#noun').text(nouns[Math.floor(Math.random() * nouns.length)])
