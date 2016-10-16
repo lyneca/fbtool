@@ -22,11 +22,11 @@
   <div id=control-panel>
     <div class="right btn" style="position: relative; bottom: 4px;" onclick="window.close();">close</div>
     <div class="center margin-bottom drag">- - - facebook messenger powertool - - -</div>
-    <div class="h-spacer"></div>
+    <!-- <div class="h-spacer"></div> -->
     <script>
       function login() {
         var fblogin = require("facebook-chat-api");
-        $("#login-btn").text("logging in...");
+        $("#login-btn").text("loading");
         fblogin({
           email: $("#username-field").val(),
           password: $("#password-field").val()
@@ -37,9 +37,9 @@
             return console.error(err);
           }
           window.api = api;
-          // window.api.setOptions({
-          //   selfListen: true,
-          // })
+          window.api.setOptions({
+            selfListen: true,
+          })
           window.currentUserID = window.api.getCurrentUserID()
           $("#login-btn").text("ready.");
           $("#thread-select-list").empty()
@@ -94,16 +94,16 @@
           });
         });
       }
+      window.stopListening = function() {}
     </script>
-    email: <input type="email" class=text-input id=username-field value="" placeholder="user.name@example.com"> password: <input type="password" class=text-input id=password-field placeholder="••••••••••••">
-    <div class=btn id=login-btn onclick="window.login()">login</div><br />
-    <!-- <div id=status-bar>Need Creds</div><br /> -->
-    <script>
-    </script>
+    email: <input autofocus type="email" class=text-input id=username-field value="" placeholder="user.name@example.com"> password: <input type="password" class=text-input id=password-field placeholder="••••••••••••">
+    <div class=btn id=login-btn onclick="window.login()">login</div>
+    <div class=h-spacer></div>
 
     thread: <input type="text" class="text-input" id="thread-id-input" placeholder="100009563164658">
     <script>
       function loadThread(threadID) {
+        window.stopListening()
         window.api.getThreadInfo(threadID, function callback(err, info) {
           if (info.name.length > 40) {
             $("#selected-thread").text(info.name.slice(0, 39) + '[...]');
@@ -114,9 +114,49 @@
           window.threadID = threadID
           $('#user-select').empty()
           window.api.getUserInfo(info.participantIDs, function(err, ret) {
+            window.users = ret
             for (var prop in ret) {
               $('#user-select').append("<option value='" + prop + "'>" + ret[prop].name + "</option>")
             }
+            window.api.getThreadHistory(window.threadID, 0, 100, "", function(err, his) {
+              window.recentMessages = his
+              for (var i = 0; i < his.length; i++) {
+                var message = his[i]
+                var user;
+                for (var prop in window.users) {
+                  if (prop == message.senderID.slice(5)) {
+                    user = window.users[prop]
+                    user.id = prop
+                  }
+                }
+                if (user.id == window.currentUserID) {
+                  $('#message-container').append("<div class='message other'>" + user.name + ": " + message.body + "</div>")
+                } else {
+                  $('#message-container').append("<div class='message self'>" + user.name + ": " + message.body + "</div>")
+                }
+              }
+              updateScroll()
+              window.stopListening = window.api.listen(function(err, message) {
+                var user;
+                if (message.type == "message") {
+                  var user;
+                  for (var prop in window.users) {
+                    if (prop == message.senderID) {
+                      var user = window.users[prop]
+                      user.id = prop
+                    }
+                  }
+                  if (message.threadID == window.threadID) {
+                    if (user.id == window.currentUserID) {
+                      $('#message-container').append("<div class='message other'>" + user.name + ": " + message.body + "</div>")
+                    } else {
+                      $('#message-container').append("<div class='message self'>" + user.name + ": " + message.body + "</div>")
+                    }
+                  }
+                  updateScroll()
+                }
+              });
+            });
           });
         });
       }
@@ -220,6 +260,7 @@
     </script>
     <div onclick="window.loadThread($('#thread-id-input').val())" class="btn" id="thread-id-load-btn">load thread from ID</div> or
     <div onclick="window.findFriend($('#thread-id-input').val())" class="btn" id="thread-id-search-btn">search friend</div>
+    <div class=h-spacer></div>
     selected thread:
     <div id="selected-thread" class="drag">none</div>
     <div class="h-spacer"></div>
@@ -252,74 +293,92 @@
     <div class="h-spacer"></div>
     when regex match /<input type=text class="text-input regex" id=regex-match placeholder="[Hh]ello (\w+)">/ send '<input type=text class="text-input regex" id=regex-replace placeholder="Hello, $1! :D">'
     <div class=btn onclick="window.listen($('#regex-match').val(), $('#regex-replace').val())" id=listen-btn>[listen]</div>
-    <div class="h-spacer"></div>
-    <div class="">
-      <span id=footer class="drag">made with <span id=noun>something</span> by lyneca</span>
-      <script>
-        $('#regex-match').on('input', function(e) {
-          var isValid = true;
-          try {
-            new RegExp($(this).val());
-          } catch (e) {
-            isValid = false;
-          }
-          if (isValid) {
-            $(this).css('color', 'inherit')
-          } else {
-            $(this).css('color', 'red')
-          }
-        });
-      </script>
-      <script>
-        $("#repetition-number").on('input', function(e) {
-          if ($("#repetition-number").value.length > 4) {
-            $("#repetition-number").value = $("#repetition-number").value.slice(0, 4);
-          }
-        });
-        $(document).ready(function() {
-          var nouns = [
-            'love',
-            'your best interests at heart ',
-            'my best interests at heart ',
-            'friggin\' sick hax',
-            'like zero effort',
-            'electron',
-            'atom',
-            'the help of stackoverflow',
-            'some node.js packages',
-            'bats',
-            'some scripting language',
-            'anything but java',
-            'a few temporary facebook bans',
-            'no respect for statewide testing',
-            'communism',
-            '1 weird tip',
+    <!-- <div class="h-spacer"></div> -->
+  </div>
+  <div id=chat-field>
+    <div id=message-container>
 
-          ]
-          $('#noun').text(nouns[Math.floor(Math.random() * nouns.length)])
-        });
-        $(document).keyup(function(event) {
-          if (event.keyCode == 27) {
-            window.close();
-          }
-        });
-        $("#thread-id-input").keyup(function(event) {
-          if (event.keyCode == 13) {
-            $("#thread-id-load-btn").click();
-          }
-        });
-        $("#password-field").keyup(function(event) {
-          if (event.keyCode == 13) {
-            $("#login-btn").click();
-          }
-        });
-        $("#thread-color-input").keyup(function(event) {
-          if (event.keyCode == 13) {
-            $("#thread-color-btn").click();
-          }
-        });
-      </script>
     </div>
+    <div id=input-container>
+      <input type=text id=chat-input>
+    </div>
+  </div>
+  <!-- <span id=footer class="drag">made with <span id=noun>something</span> by lyneca</span> -->
+  <script>
+    $('#regex-match').on('input', function(e) {
+      var isValid = true;
+      try {
+        new RegExp($(this).val());
+      } catch (e) {
+        isValid = false;
+      }
+      if (isValid) {
+        $(this).css('color', 'inherit')
+      } else {
+        $(this).css('color', 'red')
+      }
+    });
+  </script>
+  <script>
+    $("#repetition-number").on('input', function(e) {
+      if ($("#repetition-number").value.length > 4) {
+        $("#repetition-number").value = $("#repetition-number").value.slice(0, 4);
+      }
+    });
+    $(document).ready(function() {
+      var nouns = [
+        'love',
+        'your best interests at heart ',
+        'my best interests at heart ',
+        'friggin\' sick hax',
+        'like zero effort',
+        'electron',
+        'atom',
+        'the help of stackoverflow',
+        'some node.js packages',
+        'bats',
+        'some scripting language',
+        'anything but java',
+        'a few temporary facebook bans',
+        'no respect for statewide testing',
+        'communism',
+        '1 weird tip',
+
+      ]
+      $('#noun').text(nouns[Math.floor(Math.random() * nouns.length)])
+    });
+    $(document).keyup(function(event) {
+      if (event.keyCode == 27) {
+        window.close();
+      }
+    });
+    $("#chat-input").keyup(function(event) {
+      if (event.keyCode == 13) {
+        window.api.sendMessage($('#chat-input').val(), window.threadID)
+        $('#chat-input').val("")
+      }
+    });
+    $("#thread-id-input").keyup(function(event) {
+      if (event.keyCode == 13) {
+        $("#thread-id-load-btn").click();
+      }
+    });
+    $("#password-field").keyup(function(event) {
+      if (event.keyCode == 13) {
+        $("#login-btn").click();
+      }
+    });
+    $("#thread-color-input").keyup(function(event) {
+      if (event.keyCode == 13) {
+        $("#thread-color-btn").click();
+      }
+    });
+
+    function updateScroll() {
+      $('#message-container').scrollTop($('#message-container').prop('scrollHeight'));
+    }
+    // setInterval("updateScroll", 1000)
+  </script>
 </body>
 
 <script>
