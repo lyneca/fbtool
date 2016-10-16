@@ -1,6 +1,6 @@
 {
   "name": "fbtool",
-  "version": "1.0.0",
+  "version": "1.2.2",
   "description": "A tool to do things with messenger that you normally can't.",
   "main": "main.js",
   "scripts": {
