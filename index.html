@@ -10,6 +10,7 @@
     window.http = require('http')
     window.https = require('https')
     window.raveState = false;
+    window.recentThreads = {}
   </script>
 </head>
 
@@ -34,13 +35,10 @@
         }, function callback(err, api) {
           if (err) {
             $("#login-btn").text("failed!");
-            alert(err)
             return console.error(err);
           }
           window.api = api;
-          // window.api.setOptions({
-          //   selfListen: true,
-          // })
+          window.api.setOptions({listenEvents: true});
           window.currentUserID = window.api.getCurrentUserID()
           $("#login-btn").text("ready.");
           $("#thread-select-list").empty()
@@ -54,7 +52,6 @@
                 var name;
                 window.api.getUserInfo(thread.participantIDs[0], function(err, obj) {
                   if (err) {
-                    alert(err);
                     return
                   }
                   for (var prop in obj) {
@@ -212,6 +209,31 @@
         }
       }
 
+      function sayHello() {
+        if (window.helloState) {
+          window.helloState = false;
+          $('#hello-btn').text('[start]');
+          window.recentThreads = {}
+          return window.stopHello();
+        } else {
+          window.helloState = true;
+          $('#hello-btn').text('[stop]');
+          window.stopHello = window.api.listen(function(err, msg) {
+            if (msg.type == 'typ') {
+              if (msg.isTyping) {
+                if (!(window.recentThreads[msg.threadID] == true)) {
+                  window.recentThreads[msg.threadID] = false
+                }
+                if (window.recentThreads[msg.threadID] == false) {
+                  window.api.sendMessage("hello!", msg.threadID)
+                  window.recentThreads[msg.threadID] = true
+                }
+              }
+            }
+          })
+        }
+      }
+
       function listenreplace(m, r) {
         var patt = new RegExp(m, 'g')
         if (window.listen_state) {
@@ -274,7 +296,10 @@
     <div class="h-spacer"></div>
     <div class=btn id=rave-btn onclick="window.raveToggle()">
       [start]
-    </div> rave
+    </div> rave or <div class=btn id=hello-btn onclick=window.sayHello()>
+      [start]
+    </div> type listening
+
     <div class="h-spacer"></div>
     <div class="">
       <span id=footer class="drag">made with <span id=noun>something</span> by lyneca</span>
