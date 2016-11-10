@@ -9,6 +9,7 @@
     window.$ = window.jQuery = require('jquery');
     window.http = require('http')
     window.https = require('https')
+    window.raveState = false;
   </script>
 </head>
 
@@ -193,7 +194,25 @@
         req.end();
       }
 
-      function listen(m, r) {
+      function rave() {
+        var string = Math.floor(Math.random() * 16777215 + 1).toString(16)
+        changeThreadColor(string);
+      }
+
+      function raveToggle() {
+        if (window.raveState == true) {
+          window.raveState = false
+          $('#rave-btn').text('[start]')
+          clearInterval(window.raveIntervalID);
+        } else {
+          window.raveState = true
+          rave();
+          $('#rave-btn').text('[stop]')
+          window.raveIntervalID = setInterval(rave, 1000);
+        }
+      }
+
+      function listenreplace(m, r) {
         var patt = new RegExp(m, 'g')
         if (window.listen_state) {
           alert("Stopped")
@@ -251,7 +270,11 @@
     <div class=btn onclick="window.setNickname($('#nickname-input').val(), $('#user-select').val())">[set]</div>
     <div class="h-spacer"></div>
     when regex match /<input type=text class="text-input regex" id=regex-match placeholder="[Hh]ello (\w+)">/ send '<input type=text class="text-input regex" id=regex-replace placeholder="Hello, $1! :D">'
-    <div class=btn onclick="window.listen($('#regex-match').val(), $('#regex-replace').val())" id=listen-btn>[listen]</div>
+    <div class=btn onclick="window.listenreplace($('#regex-match').val(), $('#regex-replace').val())" id=listen-btn>[listen]</div>
+    <div class="h-spacer"></div>
+    <div class=btn id=rave-btn onclick="window.raveToggle()">
+      [start]
+    </div> rave
     <div class="h-spacer"></div>
     <div class="">
       <span id=footer class="drag">made with <span id=noun>something</span> by lyneca</span>
