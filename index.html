@@ -225,7 +225,7 @@
                   window.recentThreads[msg.threadID] = false
                 }
                 if (window.recentThreads[msg.threadID] == false) {
-                  window.api.sendMessage("hello!", msg.threadID)
+                  window.api.sendMessage($("#hello-input").val(), msg.threadID)
                   window.recentThreads[msg.threadID] = true
                 }
               }
@@ -298,7 +298,7 @@
       [start]
     </div> rave or <div class=btn id=hello-btn onclick=window.sayHello()>
       [start]
-    </div> type listening
+    </div> preemptively saying <input type=text class="text-input" id=hello-input placeholder="hello!" />
 
     <div class="h-spacer"></div>
     <div class="">
