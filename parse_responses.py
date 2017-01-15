@@ -11,11 +11,16 @@ def load_file():
         if file[-2:] == ';;':
             file = file[:-2]
 
-    return {r.split('::')[0].strip(): r.split('::')[1].strip() for r in file.strip().split(';;')}
+    responses = []
+    for r in file.strip().split(';;'):
+        responses.append(map(lambda x: x.strip(),r.split('::')))
 
-message = ' '.join(sys.argv[1:])
+    return responses
+
+message = ' '.join(sys.argv[1:])#.replace('\n',' ')
 responses = load_file()
 for response in responses:
-    if re.search(response, message):
-        print(responses[response])
-        sys.exit()
+    x = re.search(response[0], message)
+    if x:
+        print(re.sub(response[0], response[1], x.group(0)))
+        #sys.exit()

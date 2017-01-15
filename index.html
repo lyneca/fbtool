@@ -254,8 +254,10 @@
 
       function respond(m) {
         python.run('parse_responses.py', {args: [m.body]}, function (err, results) {
-          if (results) {
-            api.sendMessage(results[0], m.threadID)
+          if (results) { 
+            for (e in results) {
+              api.sendMessage(results[e], m.threadID)
+            }
           }
         });
       }
