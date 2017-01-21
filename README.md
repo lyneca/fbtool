@@ -38,8 +38,9 @@ App design fits right in with the atom editor, because, well, it's the same colo
 
 ### Running from source
 
-Once you've cloned the source, cd to the root and
 ```bash
+$ git clone https://github.com/lyneca/facebook-messenger-tool.git
+$ cd facebook-messenger-tool
 $ npm install && npm start
 ```
 
